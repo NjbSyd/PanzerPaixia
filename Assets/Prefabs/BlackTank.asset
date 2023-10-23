@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66103215f3b48d78a31ac10c3f5f4de, type: 3}
+  m_Name: BlackTank
+  m_EditorClassIdentifier: 
+  tankName: Black Tank
+  tankBodySprite: {fileID: 21300000, guid: e430b20f63de7064896c6fc9471f1c35, type: 3}
+  tankMuzzleSprite: {fileID: 21300000, guid: cf2c252aa44b7cc4aa53c3424d4a16b1, type: 3}
+  steerSpeed: 120
+  moveSpeed: 5
+  bulletSpeed: 1000
+  isSelected: 0
+  bullet: {fileID: 3819529703862876752, guid: 9a3e60082f699e44a868906838b3be20, type: 3}
