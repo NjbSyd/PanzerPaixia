@@ -1,45 +1,43 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class Driver : MonoBehaviour
 {
-    private GameObject bullet;
-    private AudioSource fireSound;
-    [SerializeField] private Transform bulletPoint;
+    [SerializeField] private Transform bulletPoint, centerOfMap;
     [SerializeField] private List<TankTemplate> tankTemplates;
     [SerializeField] private GameObject tankBody, tankMuzzle;
-    private TankTemplate selectedTank;
+    [SerializeField] private LevelTemplate levelTemplate;
+    private GameObject bullet;
+    private int collectedCoins, remainingCoins, pickedCoins;
     private float currentMoveSpeed;
-    private float steerSpeed;
+    private bool isSpeedBoosted, levelPassed;
     private float normalMoveSpeed;
-    int collectedCoins = 0;
-    int remainingCoins = 5;
-    bool isSpeedBoosted = false;
+    private TankTemplate selectedTank;
+    private SoundManager soundManager;
+    private float steerSpeed;
 
 
     private void Awake()
     {
-        fireSound = GetComponent<AudioSource>();
+        soundManager = SoundManager.Instance;
+        collectedCoins = pickedCoins = 0;
     }
 
-    void Start()
+    private void Start()
     {
+        StartCoroutine(InstantiateLevel());
+        remainingCoins = levelTemplate.sandBagAmount;
         ScoreManager.scoreManager.UpdateCollected(collectedCoins);
         ScoreManager.scoreManager.UpdateRemaining(remainingCoins);
-        foreach (TankTemplate template in tankTemplates)
-        {
+        ScoreManager.scoreManager.UpdatePicked(pickedCoins);
+        foreach (var template in tankTemplates)
             if (template.isSelected)
             {
                 selectedTank = template;
                 break;
             }
-        }
 
         normalMoveSpeed = selectedTank.moveSpeed;
         currentMoveSpeed = normalMoveSpeed;
@@ -49,75 +47,83 @@ public class Driver : MonoBehaviour
         bullet = selectedTank.bullet;
     }
 
-    void Update()
+    private void Update()
     {
-        Move();
-        Fire();
-    }
-
-    void Move()
-    {
-        var vert = Input.GetAxis("Vertical");
-        var hori = Input.GetAxis("Horizontal");
-
-        transform.Translate(0, currentMoveSpeed * Time.deltaTime * vert, 0);
-        transform.Rotate(0, 0, steerSpeed * Time.deltaTime * -hori);
-    }
-
-    void Fire()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!levelPassed)
         {
-            fireSound.Play();
-            Instantiate(bullet, bulletPoint.position, bulletPoint.rotation);
+            Move();
+            Fire();
         }
     }
 
-    void OnCollisionEnter2D(Collision2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
         currentMoveSpeed = normalMoveSpeed;
         isSpeedBoosted = false;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Coin"))
         {
-            Debug.Log("Coin was hit");
+            soundManager.PlayCoinSound();
             Destroy(other.gameObject);
-            collectedCoins++;
-            remainingCoins--;
-            ScoreManager.scoreManager.UpdateCollected(collectedCoins);
-            ScoreManager.scoreManager.UpdateRemaining(remainingCoins);
-            if (remainingCoins == 0)
-            {
-                StartCoroutine(LevelPassed());
-                Debug.Log("You win!");
-            }
+            pickedCoins++;
+            ScoreManager.scoreManager.UpdatePicked(pickedCoins);
         }
         else if (other.gameObject.CompareTag("Oilspil"))
         {
             isSpeedBoosted = false;
-            Debug.Log("Entered OilSpil");
             currentMoveSpeed = normalMoveSpeed / 2;
         }
+        else if (other.gameObject.CompareTag("Finish"))
+        {
+            collectedCoins += pickedCoins;
+            remainingCoins -= pickedCoins;
+            pickedCoins = 0;
+            ScoreManager.scoreManager.UpdateCollected(collectedCoins);
+            ScoreManager.scoreManager.UpdateRemaining(remainingCoins);
+            ScoreManager.scoreManager.UpdatePicked(pickedCoins);
+            if (remainingCoins == 0) StartCoroutine(LevelPassed());
+        }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Oilspil"))
-        {
-            Debug.Log("Exited OilSpil");
             currentMoveSpeed = normalMoveSpeed;
-        }
         else if (other.gameObject.CompareTag("Speedup"))
-        {
             if (!isSpeedBoosted)
                 StartCoroutine(HandleSpeedUp());
+    }
+
+    private void Move()
+    {
+        var verticalInput = Input.GetAxis("Vertical");
+        var horizontalInput = Input.GetAxis("Horizontal");
+        if (verticalInput != 0)
+        {
+            if (!soundManager.IsMoveSoundPlaying()) soundManager.PlayMoveSound();
+        }
+        else
+        {
+            soundManager.StopMoveSound();
+        }
+
+        transform.Translate(0, currentMoveSpeed * Time.deltaTime * verticalInput, 0);
+        transform.Rotate(0, 0, steerSpeed * Time.deltaTime * -horizontalInput);
+    }
+
+    private void Fire()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            soundManager.PlayFireSound();
+            Instantiate(bullet, bulletPoint.position, bulletPoint.rotation);
         }
     }
 
-    IEnumerator HandleSpeedUp()
+    private IEnumerator HandleSpeedUp()
     {
         isSpeedBoosted = true;
         currentMoveSpeed = normalMoveSpeed * 2;
@@ -126,9 +132,41 @@ public class Driver : MonoBehaviour
         isSpeedBoosted = false;
     }
 
-    IEnumerator LevelPassed()
+    private IEnumerator LevelPassed()
     {
-        yield return new WaitForSeconds(2);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        levelPassed = true;
+        currentMoveSpeed = steerSpeed = 0;
+        soundManager.LevelEnded(gameObject.transform.position);
+        yield return new WaitForSeconds(1);
+    }
+
+    private IEnumerator InstantiateLevel()
+    {
+        var occupiedPositions = new List<Vector2>();
+
+        for (var i = 0; i < levelTemplate.sandBagAmount; i++)
+        {
+            var randomPosition = GetRandomPosition(occupiedPositions);
+
+            var sandbag =
+                Instantiate(Random.Range(0, 2) == 0 ? levelTemplate.SandbagBeige : levelTemplate.SandbagBrown);
+            sandbag.transform.position = randomPosition;
+            occupiedPositions.Add(randomPosition);
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private Vector2 GetRandomPosition(List<Vector2> occupiedPositions)
+    {
+        var center = centerOfMap.position;
+        float x = center.x, y = center.y;
+
+        do
+        {
+            var randomPosition = new Vector2(Random.Range(x - 18, x + 18), Random.Range(y - 8, y + 8));
+            var positionIsValid = Physics2D.OverlapCircleAll(randomPosition, 2.5f).Length <= 0 &&
+                                  !occupiedPositions.Contains(randomPosition);
+            if (positionIsValid) return randomPosition;
+        } while (true);
     }
 }

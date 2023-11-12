@@ -2,7 +2,7 @@
 
 namespace DefaultNamespace
 {
-    [CreateAssetMenu(fileName = "New Tank", menuName = "Tank", order = 0)]
+    [CreateAssetMenu(fileName = "New Tank", menuName = "ScriptableObjects/Tank", order = 0)]
     public class TankTemplate : ScriptableObject
     {
         public string tankName;

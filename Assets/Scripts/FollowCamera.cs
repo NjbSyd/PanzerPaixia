@@ -1,14 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FollowCamera : MonoBehaviour
 {
-    [SerializeField]
-    GameObject tank;
+    [SerializeField] private GameObject tank;
 
     // Update is called once per frame
-    void LateUpdate()
+    private void LateUpdate()
     {
         transform.position = new Vector3(tank.transform.position.x, tank.transform.position.y, -13);
     }

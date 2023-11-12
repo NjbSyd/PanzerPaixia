@@ -1,8 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using TMPro;
 
 public class PlayButtonScript : MonoBehaviour
 {
@@ -18,7 +16,7 @@ public class PlayButtonScript : MonoBehaviour
         StartCoroutine(ButtonClickSoundAndAction("Credits"));
     }
 
-    IEnumerator ButtonClickSoundAndAction(string sceneName, int index = 0)
+    private IEnumerator ButtonClickSoundAndAction(string sceneName, int index = 0)
     {
         emptyGameObject.Play();
         yield return new WaitForSeconds(1);

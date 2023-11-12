@@ -17,3 +17,6 @@
 *.meta
 Thumbs.db
 *.log
+Assets/TextMesh Pro/Examples & Extras/
+Assets/TextMesh Pro/Examples & Extras/*.unity
+*.zip

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -10,7 +8,7 @@ public class DropdownController : MonoBehaviour
 
     public void HandleDropdownValue()
     {
-        int val=dropdown.value;
+        var val = dropdown.value;
         emptyGameObject.Play();
         Debug.Log(val + " Selected");
         TankInfoManager.tankInfoManager.ChangeTankTo(val);

@@ -130,7 +130,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4222108093868317894}
   m_Layer: 0
-  m_Name: BeigeSandbag
+  m_Name: GreySandbag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 1843629763842234406}
   - component: {fileID: 3972730303047174752}
   - component: {fileID: 3725023016707324042}
+  - component: {fileID: 8539009241990122851}
   m_Layer: 0
   m_Name: bag
   m_TagString: Sandbag
@@ -228,12 +229,12 @@ SpriteRenderer:
   m_SortingLayerID: -1541251261
   m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 59b473bda36026e46b62dd49f1adbf5e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 129401dcb7b6f6a48aa1ffad63da9bc8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.65, y: 1.1}
+  m_Size: {x: 0.44, y: 0.62}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -303,7 +304,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1.1, y: 1.55}
-    newSize: {x: 1.65, y: 1.1}
+    newSize: {x: 0.44, y: 0.62}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -311,3 +312,16 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.1177275, y: 1.5862737}
   m_EdgeRadius: 0
+--- !u!114 &8539009241990122851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5121376896876552212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24603bc64a8f3b9499802dc91c8b7ff7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagedSandBag: {fileID: 21300000, guid: 4cd4a6ff85f45914b81276d913cd51c8, type: 3}

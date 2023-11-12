@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
 using TMPro;
@@ -16,31 +15,25 @@ public class TankInfoManager : MonoBehaviour
         tankInfoManager = this;
     }
 
-    void Start()
+    private void Start()
     {
         ChangeTankTo();
     }
 
     public void ChangeTankTo(int index = 0)
     {
-        for (int i = 0; i < tankTemplates.Count; i++)
-        {
+        for (var i = 0; i < tankTemplates.Count; i++)
             if (i == index)
-            {
                 tankTemplates[i].isSelected = true;
-            }
             else
-            {
                 tankTemplates[i].isSelected = false;
-            }
-        }
 
-        TankTemplate tankTemplate = tankTemplates[index];
+        var tankTemplate = tankTemplates[index];
         tankBody.GetComponent<SpriteRenderer>().sprite = tankTemplate.tankBodySprite;
         tankMuzzle.GetComponent<SpriteRenderer>().sprite = tankTemplate.tankMuzzleSprite;
         tankName.text = tankTemplate.tankName;
-        tankSteerSpeed.text = "Steering: " + tankTemplate.steerSpeed.ToString();
-        tankMoveSpeed.text = "Movement: " + tankTemplate.moveSpeed.ToString();
-        tankBulletSpeed.text = "Bullet Speed: " + tankTemplate.bulletSpeed.ToString();
+        tankSteerSpeed.text = "Steering: " + tankTemplate.steerSpeed;
+        tankMoveSpeed.text = "Movement: " + tankTemplate.moveSpeed;
+        tankBulletSpeed.text = "Bullet Speed: " + tankTemplate.bulletSpeed;
     }
 }
